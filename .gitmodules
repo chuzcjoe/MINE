@@ -1,0 +1,3 @@
+[submodule "external/CORE"]
+	path = external/CORE
+	url = git@github.com:chuzcjoe/CORE.git
