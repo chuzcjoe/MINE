@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 import argparse
-
+import json
 
 class FCN(nn.Module):
     def __init__(self, input_dim: int = 10, hidden_dim: int = 60, output_dim: int = 2) -> None:
@@ -56,16 +56,22 @@ def load_and_dump_weights(path: str):
     model = FCN()
     model.load_state_dict(torch.load(path, map_location="cpu"))
     weights = []
+    meta = {}
     for name, param in model.named_parameters():
-        print(f"{name}: {param.shape}, {param.data[:10]}")
-        weights.append(param.detach().cpu().numpy().ravel())
+        tensor = param.detach().cpu()
+        weights.append(tensor.numpy().ravel())
+        meta[name] = {
+            "shape": ", ".join(str(dim) for dim in tensor.shape)
+        }
     flat = np.concatenate(weights, axis=0)
     flat.astype(np.float32).tofile("./fcn_weights.bin")
     print("saved fcn weights to fcn_weights.bin")
+    with open("./fcn.json", "w", encoding="utf-8") as fh:
+        json.dump(meta, fh, indent=2)
 
 def load_weights_bin(path: str):
     weights = np.fromfile(path, dtype=np.float32)
-    print(weights[:10])
+    print(weights[0, :10])
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Utility CLI for FCN.")
