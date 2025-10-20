@@ -8,4 +8,5 @@ set(ANDROID_STL "c++_shared")
 find_package(Vulkan REQUIRED)
 
 add_subdirectory(external/CORE)
+add_subdirectory(mine)
 add_subdirectory(tests)

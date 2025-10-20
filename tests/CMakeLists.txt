@@ -7,4 +7,4 @@ add_executable(mine_tests ${test_src})
 # TODO: expose vulkan_shaders target to tests
 # add_dependencies(mine_tests vulkan_shaders)
 
-target_link_libraries(mine_tests PUBLIC gtest vulkan mat)
+target_link_libraries(mine_tests PUBLIC gtest mine mat)

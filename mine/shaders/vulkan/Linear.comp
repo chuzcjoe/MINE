@@ -1,0 +1,59 @@
+#version 450
+
+layout(binding = 0) uniform UniformBufferObject {
+    int in_features;
+    int out_features;
+}
+ubo;
+
+layout(std430, binding = 1) readonly buffer src_in {
+    float src[];
+};
+
+layout(std430, binding = 2) readonly buffer weights_in {
+    float weights[];
+};
+
+layout(std430, binding = 3) readonly buffer bias_in {
+    float bias[];
+};
+
+layout(std430, binding = 4) buffer dst_in {
+    float dst[];
+};
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+shared float partial_sums[64];
+
+void main() {
+    const int row = int(gl_GlobalInvocationID.y);
+    if (row >= ubo.out_features) {
+        return;
+    }
+
+    const int in_feats = ubo.in_features;
+    const int col = int(gl_LocalInvocationID.x);
+    const int total_threads = int(gl_WorkGroupSize.x); // 64
+
+    float local_sum = 0.0;
+    const int weight_row_offset = row * in_feats;
+
+    for (int idx = col; idx < in_feats; idx += total_threads) {
+        local_sum += src[idx] * weights[weight_row_offset + idx];
+    }
+
+    partial_sums[col] = local_sum;
+    barrier();
+
+    for (int offset = total_threads >> 1; offset > 0; offset >>= 1) {
+        if (col < offset) {
+            partial_sums[col] += partial_sums[col + offset];
+        }
+        barrier();
+    }
+
+    if (col == 0) {
+        dst[row] = partial_sums[0] + bias[row];
+    }
+}

@@ -25,10 +25,10 @@ def init_model_with_fixed_random_weights(model: nn.Module):
         model.fc2.bias.copy_(torch.tensor([0.2, 0.01]))
 
 def test_fcn_with_random_weights(save_weights: bool):
-    batch_size = 3
+    batch_size = 1
     model = FCN()
     init_model_with_fixed_random_weights(model)
-    inputs = torch.randn(batch_size, 10)
+    inputs = torch.ones(batch_size, 10)
     outputs = model(inputs)
 
     for i in range(batch_size):
@@ -44,10 +44,20 @@ def load_and_inference(path: str):
     model = FCN()
     model.load_state_dict(torch.load(path, map_location="cpu"))
 
-    batch_size = 3
-    inputs = torch.randn(batch_size, 10)
-    outputs = model(inputs)
+    batch_size = 1
+    inputs = torch.ones(batch_size, 10)
+    fc1_out = model.fc1(inputs)
+    activation = F.relu(fc1_out)
+    outputs = model.fc2(activation)
+    probabilities = F.softmax(outputs, dim=-1)
 
+    print("input:", inputs.detach().cpu())
+    print("fc1 output:", fc1_out.detach().cpu())
+    print("relu activation:", activation.detach().cpu())
+    print("fc2 output:", outputs.detach().cpu())
+    print("softmax probabilities:", probabilities.detach().cpu())
+
+    outputs = probabilities
     for i in range(batch_size):
         print("batch: {}, output: {}".format(i, outputs[i].detach().cpu()))
 
@@ -59,6 +69,7 @@ def load_and_dump_weights(path: str):
     meta = {}
     for name, param in model.named_parameters():
         tensor = param.detach().cpu()
+        print(tensor.shape)
         weights.append(tensor.numpy().ravel())
         meta[name] = {
             "shape": ", ".join(str(dim) for dim in tensor.shape)
@@ -71,7 +82,7 @@ def load_and_dump_weights(path: str):
 
 def load_weights_bin(path: str):
     weights = np.fromfile(path, dtype=np.float32)
-    print(weights[0, :10])
+    print(weights[:10])
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Utility CLI for FCN.")
@@ -84,7 +95,7 @@ if __name__ == "__main__":
     torch.manual_seed(1)
 
     if args.test:
-        test_fcn_with_random_weights(True)
+        test_fcn_with_random_weights(False)
     if args.load:
         load_and_inference("../ckpts/fcn_weights.pt")
     if args.dump:
