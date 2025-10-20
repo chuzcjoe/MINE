@@ -66,9 +66,6 @@ TEST(LinearLayerTest, test) {
   core::vulkan::VulkanCommandBuffer command_buffer(&context);
   core::vulkan::VulkanFence fence(&context);
   core::vulkan::VulkanQueryPool query_pool(&context, VK_QUERY_TYPE_TIMESTAMP);
-  core::Mat<float, 1> mat(1, 10);
-  mat.Fill(1.0f);
-
   
   const VkDeviceSize src_buffer_size = graph.fc1_in_features * sizeof(float);
   const VkDeviceSize weights_buffer_size = graph.fc1_in_features * graph.fc1_out_features * sizeof(float);
