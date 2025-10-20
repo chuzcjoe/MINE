@@ -10,13 +10,9 @@ namespace vulkan {
 
 class Linear : public core::vulkan::VulkanCompute {
  public:
-  Linear(core::vulkan::VulkanContext* context, 
-             core::vulkan::VulkanBuffer& src,
-             core::vulkan::VulkanBuffer& weights,
-             core::vulkan::VulkanBuffer& bias,
-             core::vulkan::VulkanBuffer& dst,
-             const int in_features,
-             const int out_features);
+  Linear(core::vulkan::VulkanContext* context, core::vulkan::VulkanBuffer& src,
+         core::vulkan::VulkanBuffer& weights, core::vulkan::VulkanBuffer& bias,
+         core::vulkan::VulkanBuffer& dst, const int in_features, const int out_features);
 
   void Init() override;
   void Run(const VkCommandBuffer command_buffer);

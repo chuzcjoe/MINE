@@ -3,13 +3,9 @@
 namespace mine {
 namespace vulkan {
 
-Linear::Linear(core::vulkan::VulkanContext* context, 
-             core::vulkan::VulkanBuffer& src,
-             core::vulkan::VulkanBuffer& weights,
-             core::vulkan::VulkanBuffer& bias,
-             core::vulkan::VulkanBuffer& dst,
-             const int in_features,
-             const int out_features)
+Linear::Linear(core::vulkan::VulkanContext* context, core::vulkan::VulkanBuffer& src,
+               core::vulkan::VulkanBuffer& weights, core::vulkan::VulkanBuffer& bias,
+               core::vulkan::VulkanBuffer& dst, const int in_features, const int out_features)
     : VulkanCompute(context),
       src_buffer(src),
       weights_buffer(weights),
